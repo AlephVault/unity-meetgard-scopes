@@ -1,0 +1,21 @@
+{
+    "name": "AlephVault.Unity.Meetgard.Scopes.Samples",
+    "rootNamespace": "",
+    "references": [
+        "GUID:c7004f7d2caeb7f488e163a6b45f66cb",
+        "GUID:9fb1e86edc1bf4f46bfc867526bca155",
+        "GUID:8233aa084c7334eb18c3e9713fa443e5",
+        "GUID:aa7fb4e1c71ef8c45b640fda65eb777b",
+        "GUID:438580e4011b44553b1c6a67264565b5",
+        "GUID:cccffde430f2245d5a04195a4583a9bf"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
