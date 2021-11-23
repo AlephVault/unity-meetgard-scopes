@@ -20,7 +20,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                 ///   in the <see cref="ObjectSpawned"/> messsage for
                 ///   a given object type.
                 /// </summary>
-                public class ObjectRefreshed : ISerializable
+                public class ObjectRefreshed : WithArbitraryModel
                 {
                     /// <summary>
                     ///   The effective index of the current scope, sent
@@ -34,56 +34,12 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///   in the current scope.
                     /// </summary>
                     public uint ObjectIndex;
-
-                    /// <summary>
-                    ///   The new data to apply. How the data is received,
-                    ///   decoded and interpreted is up to the client. The
-                    ///   data may involve a full refresh or some sort of
-                    ///   "delta" refresh. What is known: this data is,
-                    ///   actually, the dumped contents of an object
-                    ///   satisfying <see cref="ISerializable"/>. Both
-                    ///   the client and server must agree the underlying
-                    ///   type being used to encode/decode the data.
-                    /// </summary>
-                    public byte[] Data;
-
-                    /// <summary>
-                    ///   This is a model to use in place of data. This is
-                    ///   actually useful to avoid dumping data to an array
-                    ///   and allocating buffers on each run, or having to
-                    ///   worry about buffer management. In this case, when
-                    ///   this Model is not null (this applies not to read
-                    ///   but write only), it will be used instead of using
-                    ///   the Data field.
-                    /// </summary>
-                    public ISerializable Model;
-
-                    /// <summary>
-                    ///   This is the size of the model. Only meaninful when
-                    ///   the Model is provided.
-                    /// </summary>
-                    public int ModelSize;
-
-                    public void Serialize(Serializer serializer)
+                    
+                    public override void Serialize(Serializer serializer)
                     {
                         serializer.Serialize(ref ScopeIndex);
                         serializer.Serialize(ref ObjectIndex);
-                        if (!serializer.IsReading)
-                        {
-                            if (Model != null)
-                            {
-                                serializer.Serialize(ref ModelSize);
-                                Model.Serialize(serializer);
-                            }
-                            else
-                            {
-                                serializer.Serialize(ref Data);
-                            }
-                        }
-                        else
-                        {
-                            serializer.Serialize(ref Data);                            
-                        }
+                        base.Serialize(serializer);
                     }
                 }
             }

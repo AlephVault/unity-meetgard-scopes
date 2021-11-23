@@ -36,7 +36,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                 ///     be destroyed / somehow unloaded).
                 ///   </para>
                 /// </summary>
-                public partial class ScopesProtocolClientSide : ProtocolClientSide<ScopesProtocolDefinition>
+                public class ScopesProtocolClientSide : ProtocolClientSide<ScopesProtocolDefinition>
                 {
                     /// <summary>
                     ///   A container for a UnityObject implementing the interface:

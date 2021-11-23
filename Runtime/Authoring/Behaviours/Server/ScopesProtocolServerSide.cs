@@ -30,7 +30,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                 public partial class ScopesProtocolServerSide : ProtocolServerSide<ScopesProtocolDefinition>
                 {
                     // Whether to debug or not using XDebug.
-                    private static bool debug = true;
+                    private static bool debug = false;
 
                     /// <summary>
                     ///   List of the prefabs that will be used to instantiate scopes.
