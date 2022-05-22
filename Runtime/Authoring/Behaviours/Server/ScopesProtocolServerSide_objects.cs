@@ -46,7 +46,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                         debugger.Start();
                         if (prefabId >= objectPrefabs.Length)
                         {
-                            throw new ArgumentOutOfRangeException("prefabId");
+                            throw new ArgumentOutOfRangeException(nameof(prefabId));
                         }
                         debugger.End();
 
@@ -73,7 +73,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                         XDebug debugger = new XDebug("Meetgard.Scopes", this, $"InstantiateHere({key})", debug);
                         debugger.Start();
                         key = key?.Trim();
-                        if (key == null || key.Length == 0)
+                        if (string.IsNullOrEmpty(key))
                         {
                             throw new ArgumentException("The target object prefab key must not be null/empty for instantiation");
                         }

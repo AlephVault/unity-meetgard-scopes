@@ -136,7 +136,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                             if (prefab.PrefabKey != "")
                             {
                                 string key = prefab.PrefabKey.Trim();
-                                if (key.Length == 0)
+                                if (key.Length != 0)
                                 {
                                     if (prefabByKey.ContainsKey(key))
                                     {
