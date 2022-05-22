@@ -51,6 +51,31 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     }
 
                     /// <summary>
+                    ///   Builds the whole layout of values to send
+                    ///   to the different subsets of connections,
+                    ///   depending on game logic. For tips and more
+                    ///   details, see <see cref="GetRefreshData"/>.
+                    /// </summary>
+                    /// <param name="connections">The whole connections in a scope</param>
+                    /// <param name="context">The refresh context to consider</param>
+                    /// <returns>A list of pairs (connections, data), so each set of connections can potentially receive different sets of data</returns>
+                    public override List<Tuple<HashSet<ulong>, ISerializable>> RefreshData(HashSet<ulong> connections, string context)
+                    {
+                        XDebug debugger = new XDebug("Meetgard.Scopes", this, "RefreshData(...)", debug);
+                        debugger.Start();
+                        Dictionary<RefreshType, HashSet<ulong>> results = new Dictionary<RefreshType, HashSet<ulong>>();
+                        foreach(ulong connection in connections ?? new HashSet<ulong>())
+                        {
+                            debugger.Info($"Grouping connection {connection} by refresh data");
+                            results.SetDefault(GetRefreshData(connection, context), () => new HashSet<ulong>()).Add(connection);
+                        }
+                        debugger.End();
+                        return (from result in results select new Tuple<HashSet<ulong>, ISerializable>(
+                            result.Value, result.Key
+                        )).ToList();
+                    }
+
+                    /// <summary>
                     ///   Type-aware method to retrieve the appropriate
                     ///   object for full data for a given connection.
                     ///   Tip: This method may be implemented using the
@@ -80,7 +105,9 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///   Tip: This method may be implemented using the
                     ///   concept of "dirty" values so existing objects
                     ///   are not meant to be recomputed each time, until
-                    ///   a relevant change is done.
+                    ///   a relevant change is done. Alternatively, ensure
+                    ///   an <see cref="Equals(object)"/> is class-defined
+                    ///   appropriately.
                     /// </summary>
                     /// <param name="connection">The connection to get the data for</param>
                     /// <param name="context">The refresh context</param>

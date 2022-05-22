@@ -36,6 +36,10 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     // Use case: when a new connection requests refresh, for each object.
                     internal Func<ulong, ObjectRefreshed, Task> SendObjectRefreshed;
 
+                    // A broadcaster for the ObjectRefreshed message.
+                    // Use case: when a new object spawns, for each connection.
+                    internal Func<IEnumerable<ulong>, ObjectRefreshed, Dictionary<ulong, Task>> BroadcastObjectRefreshed;
+
                     // A broadcaster for the ObjectDespawned message.
                     // Use case: when an object despawns, for each connection.
                     internal Func<IEnumerable<ulong>, ObjectDespawned, Dictionary<ulong, Task>> BroadcastObjectDespawned;

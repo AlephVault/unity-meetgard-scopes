@@ -129,6 +129,19 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     public abstract List<Tuple<HashSet<ulong>, ISerializable>> FullData(HashSet<ulong> connections);
 
                     /// <summary>
+                    ///   Returns the refresh data of this object to synchronize for
+                    ///   the connections. Each set of connection might receive a custom
+                    ///   data set for this object. Warning: Both client and server must
+                    ///   agree on the data type and it must be the same in all of the
+                    ///   entries, save for certain fields which can be "censored" to
+                    ///   null or empty (the data type itself must tolerate this).
+                    /// </summary>
+                    /// <param name="connections">The whole connections in a scope</param>
+                    /// <param name="context">The refresh context to consider</param>
+                    /// <returns>A list of pairs (connections, data), so each set of connections can potentially receive different sets of data</returns>
+                    public abstract List<Tuple<HashSet<ulong>, ISerializable>> RefreshData(HashSet<ulong> connections, string context);
+
+                    /// <summary>
                     ///   Returns the data of this object to synchronize for the
                     ///   connection. Warning: Both client and server must agree on
                     ///   the data type and it must be the same in all the possible

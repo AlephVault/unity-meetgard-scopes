@@ -249,11 +249,39 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     }
 
                     /// <summary>
+                    ///   Refreshes a single object to all the connections
+                    ///   that belong to the same scope.
+                    /// </summary>
+                    /// <param name="target">The object to refresh</param>
+                    public Task RefreshExistingObject(ObjectServerSide target, string context)
+                    {
+                        return Protocol.RunInMainThread(async () =>
+                        {
+                            XDebug debugger = new XDebug("Meetgard.Scopes", this, $"RefreshExistingObject({context})", debug);
+                            debugger.Start();
+                            foreach (Tuple<HashSet<ulong>, ISerializable> pair in target.RefreshData(connections, context))
+                            {
+                                if (pair.Item2 != null)
+                                {
+                                    string joinedConnectionsSubset = string.Join(", ", pair.Item1);
+                                    debugger.Info($"Current connections subset: {joinedConnectionsSubset}, model: {pair.Item2}");
+                                    Protocol.BroadcastObjectRefreshed(pair.Item1, new ObjectRefreshed() {
+                                        ObjectIndex = target.Id,
+                                        ScopeIndex = Id,
+                                        Model = pair.Item2
+                                    });
+                                }
+                            }
+                            debugger.End();
+                        });
+                    }
+
+                    /// <summary>
                     ///   <para>
                     ///     For a given connection, it refreshes all of its objects,
                     ///     considering a given refresh context. Typically, this
                     ///     method should be needed few times... not per connection
-                    ///     but per underlying profile. This operation is heave and,
+                    ///     but per underlying profile. This operation is heavy and,
                     ///     like the initial sync, it may consume some degree of
                     ///     network resources.
                     ///   </para>
