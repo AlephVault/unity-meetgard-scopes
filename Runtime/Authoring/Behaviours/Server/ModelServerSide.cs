@@ -4,6 +4,7 @@ using AlephVault.Unity.Support.Generic.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 
 namespace AlephVault.Unity.Meetgard.Scopes
@@ -122,6 +123,27 @@ namespace AlephVault.Unity.Meetgard.Scopes
                         RefreshType refreshData = GetRefreshData(connection, context);
                         debugger.End();
                         return refreshData;
+                    }
+
+                    /// <summary>
+                    ///   Refreshes the current object.
+                    /// </summary>
+                    /// <param name="context">The refresh context</param>
+                    public Task Refresh(string context = "")
+                    {
+                        if (Scope) return Scope.RefreshExistingObject(this, context);
+                        return Task.CompletedTask;
+                    }
+
+                    /// <summary>
+                    ///   Refreshes the current object to a single connection.
+                    /// </summary>
+                    /// <param name="connection">The connection to refresh this object to</param>
+                    /// <param name="context">The refresh context</param>
+                    public Task RefreshTo(ulong connection, string context = "")
+                    {
+                        if (Scope) return Scope.RefreshExistingObjectsTo(connection, context);
+                        return Task.CompletedTask;
                     }
                 }
             }
