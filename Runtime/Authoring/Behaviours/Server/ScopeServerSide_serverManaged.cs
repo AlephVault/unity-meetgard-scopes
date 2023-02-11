@@ -124,10 +124,21 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     /// <summary>
                     ///   Returns an iterator of all the connections in the scope.
                     /// </summary>
-                    /// <returns>The iterator</returns>
-                    public IEnumerable<ulong> Connections()
+                    /// <param name="except">Excludes some connection to be returned</param>
+                    /// <returns>The iterator of connection ids</returns>
+                    public IEnumerable<ulong> Connections(ISet<ulong> except = null)
                     {
-                        foreach (ulong connection in connections) yield return connection;
+                        if (except == null)
+                        {
+                            foreach (ulong connection in connections) yield return connection;
+                        }
+                        else
+                        {
+                            foreach (ulong connection in connections)
+                            {
+                                if (!except.Contains(connection)) yield return connection;
+                            }
+                        }
                     }
                 }
             }
