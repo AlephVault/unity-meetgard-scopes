@@ -41,12 +41,12 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///   scope is to be used as an extra scope prefab.
                     /// </summary>
                     [SerializeField]
-                    private string key;
+                    private string prefabKey;
 
                     /// <summary>
                     ///   See <see cref="key"/>.
                     /// </summary>
-                    public string PrefabKey => key;
+                    public string PrefabKey => prefabKey;
 
                     /// <summary>
                     ///   The ID of the prefab. It will either be a
