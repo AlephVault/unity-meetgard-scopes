@@ -107,7 +107,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                             if (scope.PrefabKey != "")
                             {
                                 string key = scope.PrefabKey.Trim();
-                                if (key.Length == 0)
+                                if (key.Length != 0)
                                 {
                                     if (extraScopePrefabIndicesByKey.ContainsKey(key))
                                     {
@@ -115,10 +115,6 @@ namespace AlephVault.Unity.Meetgard.Scopes
                                     }
                                     extraScopePrefabIndicesByKey.Add(key, index);
                                 }
-                            }
-                            else
-                            {
-                                throw new ArgumentException("There are duplicate keys among the registered extra scope prefabs' ones");
                             }
                             index++;
                         }
