@@ -71,6 +71,13 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     public event Action OnLoadComplete = null;
 
                     /// <summary>
+                    ///   This event is triggered when the default world is completely
+                    ///   unloaded (i.e. all the default scopes and extra scopes were
+                    ///   completely unloaded).
+                    /// </summary>
+                    public event Action OnUnloadComplete = null;
+
+                    /// <summary>
                     ///   This event is triggered when an error occurs while trying
                     ///   to unload a particular world scene. The intention of this
                     ///   handler is to log the exception somewhere. It is advised
@@ -258,6 +265,8 @@ namespace AlephVault.Unity.Meetgard.Scopes
                         // if well managed by the per-game logic, that
                         // will not affect the overall game experience.
                         DestroyInstantiatedScopes();
+                        
+                        OnUnloadComplete?.Invoke();
 
                         // Set the final, success, status.
                         WorldLoadStatus = LoadStatus.Empty;
