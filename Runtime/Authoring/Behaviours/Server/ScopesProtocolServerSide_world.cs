@@ -65,6 +65,12 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     public event Action<System.Exception> OnLoadError = null;
 
                     /// <summary>
+                    ///   This event is triggered when the default world is completely
+                    ///   loaded (i.e. all the default scopes are ready).
+                    /// </summary>
+                    public event Action OnLoadComplete = null;
+
+                    /// <summary>
                     ///   This event is triggered when an error occurs while trying
                     ///   to unload a particular world scene. The intention of this
                     ///   handler is to log the exception somewhere. It is advised
@@ -181,6 +187,8 @@ namespace AlephVault.Unity.Meetgard.Scopes
 
                             // Set the final, success, status.
                             WorldLoadStatus = LoadStatus.Ready;
+                            
+                            OnLoadComplete?.Invoke();
                         }
                         catch (System.Exception e)
                         {
@@ -276,7 +284,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                         {
                             XDebug debugger = new XDebug("Meetgard.Scopes", this, $"LoadExtraScope({extraScopePrefabKey})", debug);
                             debugger.Start();
-                            debugger.Info("Checking world satatus");
+                            debugger.Info("Checking world status");
                             if (WorldLoadStatus != LoadStatus.Ready)
                             {
                                 throw new InvalidOperationException(
