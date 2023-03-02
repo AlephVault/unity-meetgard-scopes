@@ -136,7 +136,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                                 {
                                     try
                                     {
-                                        debugger.Info("Triggeing OnUnloadError");
+                                        debugger.Info("Triggering OnUnloadError");
                                         OnUnloadError?.Invoke(pair.Key, pair.Value, e);
                                     }
                                     catch(System.Exception)
