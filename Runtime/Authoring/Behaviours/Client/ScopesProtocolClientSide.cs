@@ -4,7 +4,7 @@ using AlephVault.Unity.Meetgard.Scopes.Types.Constants;
 using AlephVault.Unity.Meetgard.Scopes.Types.Protocols;
 using AlephVault.Unity.Meetgard.Scopes.Types.Protocols.Messages;
 using AlephVault.Unity.Support.Authoring.Behaviours;
-using AlephVault.Unity.Support.Generic.Vendor.IUnified.Authoring.Types;
+using AlephVault.Unity.Support.Generic.Authoring.Types;
 using AlephVault.Unity.Support.Utils;
 using System;
 using System.Collections.Generic;
@@ -43,7 +43,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///   <see cref="IObjectClientSideInstanceManager"/>.
                     /// </summary>
                     [Serializable]
-                    public class IObjectClientSideInstanceManagerContainer : IUnifiedContainer<IObjectClientSideInstanceManager> {}
+                    public class IObjectClientSideInstanceManagerContainer : Interfaced<IObjectClientSideInstanceManager> {}
 
                     // Whether to debug or not using XDebug.
                     private static bool debug = false;
@@ -79,7 +79,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     public ScopeClientSide CurrentScope { get; private set; }
 
                     // The currently loaded objects.
-                    private Dictionary<uint, ObjectClientSide> currentObjects = new Dictionary<uint, ObjectClientSide>();
+                    private Support.Generic.Authoring.Types.Dictionary<uint, ObjectClientSide> currentObjects = new Support.Generic.Authoring.Types.Dictionary<uint, ObjectClientSide>();
 
                     /// <summary>
                     ///   The currently loaded scope id. This is particularly
