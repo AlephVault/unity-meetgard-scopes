@@ -41,3 +41,37 @@ So, pretty much, this is what happens:
 This package defines no particular way to interact with those objects, but only the notion of the objects being notified to the clients.
 
 The sections here will describe the whole life-cycle and the involved objects.
+
+## Involved protocols
+
+The in-scene `NetworkServer` object must add a `ScopesProtocolServerSide` protocol. Also, the in-scene `NetworkClient` object must add the corresponding `ScopesProtocolClientSide` at the same in-object position.
+
+Those classes are located at `AlephVault.Unity.Meetgard.Scopes.Authoring.Behaviours.Server` and `AlephVault.Unity.Meetgard.Scopes.Authoring.Behaviours.Client` respectively.
+
+This document will presume that those components will be properly added to those respective objects from now on.
+
+## Creating the Scopes
+
+As said in the previous sections, Scopes are a fancy way to describe what we usually know as "rooms" in most games. A single client connection will only belong to one of those rooms.
+
+### Creating the scope assets
+
+The first thing to do is to define the scope _prefabs_. The first one is the _server side_:
+
+1. Create, in scene, an object as you please. Add, on it, whatever behaviour is conceived as necessary.
+2. This one will be the "server side" of a scope. Add the `ScopeServerSide` component to it (at `AlephVault.Unity.Meetgard.Scopes.Authoring.Behaviours.Server`).
+3. Drag it anywhere you want in the project view to store it as a prefab asset (e.g. into `Assets/Objects`).
+4. Delete the in-scene instance, keeping the prefab only.
+
+The next one is the _client side_:
+
+1. Create, in scene, an object as you please. Add, on it, whatever behaviour is conceived as necessary.
+2. This one will be the "client side" of a scope. Add the `ScopeClientSide` component to it (at `AlephVault.Unity.Meetgard.Scopes.Authoring.Behaviours.Client`).
+3. Drag it anywhere you want in the project view to store it as a prefab asset (e.g. into `Assets/Objects`).
+4. Delete the in-scene instance, keeping the prefab only.
+
+Now, the template is ready (perhaps more behaviours are needed? that's a per-game question, but so far it's ready as a bare scope at least).
+
+### Installing the scopes in the protocol
+
+Now that both client and server parts of a scope are defined, add them in the respective protocol sides (client and server) _in the same list and position_.
