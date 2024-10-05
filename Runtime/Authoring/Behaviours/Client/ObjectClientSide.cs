@@ -53,9 +53,9 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     /// <summary>
                     ///   If the object is spawned, this field will have which
                     ///   scope this object is spawned into. If the object belongs
-                    ///   to a server but it is not spawned, this value will be
+                    ///   to a server, but it is not spawned, this value will be
                     ///   null. When this value is set, the <see cref="Id"/> field
-                    ///   will have a meaninful value: the id this object was given
+                    ///   will have a meaningful value: the id this object was given
                     ///   when spawning this object (and also populating this field).
                     /// </summary>
                     public ScopeClientSide Scope { get; private set; }
@@ -92,19 +92,19 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     /// <param name="scope">The scope to attach this object to</param>
                     /// <param name="id">The id to give to this object</param>
                     /// <param name="data">The data to use for spawning</param>
-                    public void Spawn(ScopeClientSide scope, uint id, byte[] data)
+                    internal void Spawn(ScopeClientSide scope, uint id, byte[] data)
                     {
                         XDebug debugger = new XDebug("Meetgard.Scopes", this, $"Spawn({scope.Id}, {id})", debug);
                         debugger.Start();
                         debugger.Info("Checking parameters and status");
                         if (scope == null)
                         {
-                            throw new ArgumentNullException("scope");
+                            throw new ArgumentNullException(nameof(scope));
                         }
 
                         if (data == null)
                         {
-                            throw new ArgumentNullException("data");
+                            throw new ArgumentNullException(nameof(data));
                         }
 
                         if (!gameObject)
@@ -147,7 +147,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///   Despawns the object. Only valid when the object is already
                     ///   spawned.
                     /// </summary>
-                    public void Despawn()
+                    internal void Despawn()
                     {
                         XDebug debugger = new XDebug("Meetgard.Scopes", this, $"Despawn() [current id: {Id}]", debug);
                         debugger.Start();
@@ -181,7 +181,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     /// </summary>
                     /// <param name="data">The data to perform the refresh with. It might be partially censored</param>
                     /// <returns>The de-serialized model</returns>
-                    public ISerializable Refresh(byte[] data)
+                    internal ISerializable Refresh(byte[] data)
                     {
                         XDebug debugger = new XDebug("Meetgard.Scopes", this, $"Refresh() [current id: {Id}]", debug);
                         debugger.Start();
