@@ -75,3 +75,74 @@ Now, the template is ready (perhaps more behaviours are needed? that's a per-gam
 ### Installing the scopes in the protocol
 
 Now that both client and server parts of a scope are defined, add them in the respective protocol sides (client and server) _in the same list and position_.
+
+In the client object, ensure the `NetworkClient` (and other dependencies) is added and then these components in order:
+
+1. The `ZeroProtocolClientSide` component. Configure it properly (e.g. "Don't Destroy" to True).
+2. The `ScopesProtocolClientSide` component.
+
+In the server object, ensure the `NetworkServer` (and other dependencies) is added and then these components in order:
+
+1. The `ZeroProtocolServerSide` component. Configure it properly (e.g. "Don't Destroy" to True).
+2. The `ScopesProtocolServerSide` component.
+
+Once these elements are set, it's time to configure the _scopes_. In the previous steps, it was (or must have been) guaranteed that each scope is defined in pairs: client and server sides. So now it's time to use them:
+
+1. In the client object, in its `ScopesProtocolClientSide`, add your scopes' client side objects to the `Default Scope Prefabs` array.
+2. In the server object, in its `ScopesProtocolServerSide`, do the same with the scopes' server side objects.
+3. **Ensure the corresponding objects are added in the same order on each side** in both client and server protocols. Since each scope is created by pairs of client/server object, ensure both parts of a same scope are added respectively but at the same index on each client/server protocol.
+
+There, the _default scope prefabs_ are set (a later section will describe how to use the _extra scope prefabs_). An important note about these default scopes is their life-cycle:
+
+1. When the server starts, the default scopes are instantiated one by one and registered.
+2. When the server stops, those instantiated scopes are released.
+3. Scopes (default or extra) have callbacks that tell the users when they're being loaded or being unloaded. Custom logic can/should be added, in extra behaviours attached to the scopes to attend those events and react properly.
+
+### Configuring the scopes
+
+The `ScopeClientSide` component does not need an extra configuration, but it's up to the user to add new behaviours and actual game logic.
+
+Almost the same can be said about the `ScopeServerSide` component, save for one property: These objects have an optional `Prefab Key` property, which must be unique and will only relate to `extra scopes` (which will be detailed later).
+
+It must be remembered that scopes by themselves _do not synchronize custom data from the server_, but any additional Meetgard-based logic can be used to synchronize data. This means that this typically occurs:
+
+1. When entering a scope in the server, a matching client-side scope will be loaded in the client (any former scope will be deleted).
+2. Then, all the in-server objects will be recognized and loaded in the client side. Objects will be detailed later but, essentially, the same logic applies: clients have matching client-side objects that correspond to the objects in the server-side, but with less logic and more visuals instead.
+3. Additionally from that, _nothing else is synchronized from the server_. The scope might have its own detail and objects matching from the server into the clients, and the clients must have all the relevant information to represent the scope.
+   1. If, by chance, there's something else to synchronize, there are particular events that can be implemented to detect a connection entering a server-side scope and then doing whatever is needed (e.g. manually sending a custom message that synchronizes more data).
+
+### Creating the objects assets
+
+This part is tricky. Object assets must also be properly defined with a client-side part and a server-side part.
+
+While scopes have their load/unload life-cycle, the objects have a different life-cycle:
+
+1. Objects can be _spawned_ at any time after the server is started. Already in-scope clients will be aware of it immediately.
+2. Objects can be _refreshed_ at any time after they're spawned. Already in-scope clients will be aware of it immediately.
+3. Objects can be _de-spawned_ at any time after they're spawned. Already in-scope clients will be aware of it immediately.
+4. When a client becomes in-scope, it will detect all the in-scope spawned objects with their respectively most-recent refreshed data.
+
+In order to create an object asset, the process is similar, yet requires _more work_:
+
+1. Create the in-scene object.
+2. Add the server-side Unity logic it needs via custom behaviours.
+3. Create a subclass of `AlephVault.Unity.Meetgard.Scopes.Authoring.Behaviours.Server.ObjectServerSide` relevant to the object (unless a suitable class was defined for other object(s)).
+   1. There are many methods, that will be explained in this section, that must be implemented in the new subclass.
+4. Drag it anywhere you want in the project view to store it as a prefab asset (e.g. into `Assets/Objects`).
+5. Delete the in-scene instance, keeping the prefab only.
+
+And similar for the client:
+
+1. Create the in-scene object.
+2. Add the client-side Unity logic it needs via custom behaviours.
+3. Create a subclass of `AlephVault.Unity.Meetgard.Scopes.Authoring.Behaviours.Client.ObjectClientSide` relevant to the object (unless a suitable class was defined for other object(s)).
+   1. There are many methods, that will be explained in this section, that must be implemented in the new subclass.
+4. Drag it anywhere you want in the project view to store it as a prefab asset (e.g. into `Assets/Objects`).
+5. Delete the in-scene instance, keeping the prefab only.
+
+# TODO explain methods
+# TODO explain Model subclasses
+
+### Installing the objects in the protocol
+
+# TODO explain here
