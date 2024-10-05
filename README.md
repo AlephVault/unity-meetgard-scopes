@@ -140,7 +140,160 @@ And similar for the client:
 4. Drag it anywhere you want in the project view to store it as a prefab asset (e.g. into `Assets/Objects`).
 5. Delete the in-scene instance, keeping the prefab only.
 
-# TODO explain methods
+Users do not need to explicitly keep track of spawned objects, as they don't need so call explicit things on (default) scopes.
+
+This will be explained in later sections.
+
+#### Subclassing `ObjectServerSide` and `ObjectClientSide`
+
+Defining a subclass of `ObjectServerSide` involves defining these methods:
+
+```csharp
+using AlephVault.Unity.Meetgard.Scopes.Authoring.Behaviours.Server;
+
+class MyObjectServerSide : ObjectServerSide 
+{
+    public List<Tuple<HashSet<ulong>, ISerializable>> FullData(HashSet<ulong> connections) 
+    {
+        // The return value is a list of groupings of the connections
+        // and the data packet that will be sent respectively to each
+        // group.
+        //
+        // This happens when the object sends some public data to the
+        // users in general, but some particular data to a reduced
+        // group of objects.
+        //
+        // By default, one might have no special concesions and just
+        // return the same data to all the connections, so this is a
+        // useful and default implementation:
+        return new List<Tuple<HashSet<ulong>, ISerializable>>() 
+        {
+            new Tuple<HashSet<ulong>, ISerializable>(connections, new SomeISerializableClass() 
+            {
+                SomeField = SomeData,
+                ...
+            });
+        }
+    }
+    
+    public List<Tuple<HashSet<ulong>, ISerializable>> RefreshData(HashSet<ulong> connections, string context) 
+    {
+        // The return value is similar here, but the data is intended
+        // to NOT be complete. The idea is the following:
+        //
+        // 1. The context is an arbitrary string and should tell an
+        //    idea of which data is to be sent.
+        // 2. The data to send will not be complete. Mandatory, will
+        //    ALWAYS BE OF THE SAME TYPE, but with many fields in null.
+        //
+        // An example implementation sending the same conditional updates
+        // to all the connections comes like this:
+        SomeISerializableClass what = null;
+        switch(context) 
+        {
+            case "foo":
+                what = new SomeISerializableClass() { Foo = SomeFooValue };
+                break;
+            case "bar":
+                what = new SomeISerializableClass() { Bar = SomeBarValue };
+                break;
+            default:
+                what = new SomeISerializableClass() 
+                {
+                    /* At your criteria - perhaps nothing here, or perhaps a default "full" initialization */
+                };
+                break;
+        }
+        return new List<Tuple<HashSet<ulong>, ISerializable>>() 
+        {
+            new Tuple<HashSet<ulong>, ISerializable>(connections, what);
+        }
+    }
+    
+    public ISerializable FullData(ulong connection) 
+    {
+        // Use this method like the previous ones but to notify the
+        // full contents to a single connection. This one will most
+        // likely be a constant return w.r.t the argument, like this:
+        return new SomeISerializableClass() 
+        {
+            SomeField = SomeData,
+            ...
+        };
+    }
+    
+    public ISerializable RefreshData(ulong connection, string context) 
+    {
+        // Use this method like the previous ones but to notify some
+        // perhaps context-depending partial contents, like this:
+        switch(context) 
+        {
+            case "foo":
+                return new SomeISerializableClass() { Foo = SomeFooValue };
+            case "bar":
+                return new SomeISerializableClass() { Bar = SomeBarValue };
+            default:
+                return new SomeISerializableClass() 
+                {
+                    /* At your criteria - perhaps nothing here, or perhaps a default "full" initialization */
+                };
+        }
+    }
+}
+```
+
+While, for the client, the overrides will look like this:
+
+```csharp
+using AlephVault.Unity.Meetgard.Scopes.Authoring.Behaviours.Server;
+using System.IO;
+using AlephVault.Unity.Binary;
+
+// Let's get or create a MyType object.
+
+// Let's make a Write-Serializer.
+class MyObjectClientSide : ObjectServerSide 
+{
+    protected void ReadSpawnData(byte[] data) 
+    {
+        // Given an array of bytes, the idea here is to read
+        // CONSISTENTLY the full data sent by the object. For
+        // simplicity, this process is pretty much constant
+        // but a `Serializer` must be used according to the
+        // mechanics in `unity-binary` for that purpose. Also,
+        // the class to use should match the server's or at
+        // least have the same mechanism of serialization.
+        SomeISerializableClass myObj = new SomeISerializableClass();
+        Buffer stream = new Buffer(data);
+        Serializer serializer = new Serializer(new Reader(stream));
+        serializer.Serialize(myObj);
+        // Then, do something affecting myObj.
+    }
+    
+    protected ISerializable ReadRefreshData(byte[] data)
+    {
+        // Here, the refresh is NOT context-aware. The data
+        // might come with some null fields or some custom
+        // attributes telling what's being refreshed and
+        // what's not.
+        //
+        // The implementation must parse it straightly, like
+        // this implementation.
+        SomeISerializableClass myObj = new SomeISerializableClass();
+        Buffer stream = new Buffer(data);
+        Serializer serializer = new Serializer(new Reader(stream));
+        serializer.Serialize(myObj);
+        return myObj;
+        // In the end, the returned object will be forwarded
+        // to the .OnRefreshed(ISerializable myObj).
+    }
+}
+```
+
+So this is the first part: __the client-side and server-side must both define these respective methods__.
+
+#### Alternate convenient subclasses: `ModelServerSide` and `ModelClientSide`
+
 # TODO explain Model subclasses
 
 ### Installing the objects in the protocol
