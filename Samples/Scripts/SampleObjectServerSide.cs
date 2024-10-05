@@ -21,8 +21,6 @@ namespace AlephVault.Unity.Meetgard.Scopes
                 relatedObject = GetComponent<SampleObject>();
             }
 
-            public uint InternalId;
-
             public Color32 Color
             {
                 get
