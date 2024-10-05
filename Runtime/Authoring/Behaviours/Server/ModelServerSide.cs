@@ -124,27 +124,6 @@ namespace AlephVault.Unity.Meetgard.Scopes
                         debugger.End();
                         return refreshData;
                     }
-
-                    /// <summary>
-                    ///   Refreshes the current object.
-                    /// </summary>
-                    /// <param name="context">The refresh context</param>
-                    public Task Refresh(string context = "")
-                    {
-                        if (Scope) return Scope.RefreshExistingObject(this, context);
-                        return Task.CompletedTask;
-                    }
-
-                    /// <summary>
-                    ///   Refreshes the current object to a single connection.
-                    /// </summary>
-                    /// <param name="connection">The connection to refresh this object to</param>
-                    /// <param name="context">The refresh context</param>
-                    public Task RefreshTo(ulong connection, string context = "")
-                    {
-                        if (Scope) return Scope.RefreshExistingObjectsTo(connection, context);
-                        return Task.CompletedTask;
-                    }
                 }
             }
         }
