@@ -292,9 +292,87 @@ class MyObjectClientSide : ObjectServerSide
 
 So this is the first part: __the client-side and server-side must both define these respective methods__.
 
+However, as it can easily be spotted, there's a lot of boilerplate to consider here, especially related to using the `unity-binary` features. Fortunately, there's a better and easier convenience alternative.
+
 #### Alternate convenient subclasses: `ModelServerSide` and `ModelClientSide`
 
-# TODO explain Model subclasses
+There are two convenience classes that can be used to have a better _templated_ management of the spawn/refresh code.
+
+1. `AlephVault.Unity.Meetgard.Scopes.Authoring.Behaviours.Client.ModelClientSide`, a convenience better than `ObjectClientSide`.
+2. `AlephVault.Unity.Meetgard.Scopes.Authoring.Behaviours.Server.ModelServerSide`, a convenience better than `ObjectServerSide`.
+
+The purpose is _the exact same_ of the previous classes, but with convenience implementations that might be slightly more restrictive to some extent. For example, before everything, it must be understood that now each subclass works, respectively, _with a fixed ISerializable class_.
+
+While there's still room for some black _magick_ in the ObjectServerSide / ObjectClientSide pair, those tricks are still hard to implement and are not necessarily that worth the effort. Typically, under very serious needs, it's better to use these convenience classes.
+
+Using these classes _still involves implementing abstract methods_. For the server side class(es) it looks like this:
+
+```csharp
+using AlephVault.Unity.Meetgard.Scopes.Authoring.Behaviours.Server;
+using AlephVault.Unity.Binary;
+
+class MyModelServerSide : ModelServerSide<SomeISerializableClass> 
+{
+    protected SomeISerializableClass GetRefreshData(ulong connection, string context) 
+    {
+        // This is the same logic here: Gven a connection and a context,
+        // return the partial object to be updated.
+        switch(context) 
+        {
+            case "foo":
+                return new SomeISerializableClass() { Foo = SomeFooValue };
+            case "bar":
+                return new SomeISerializableClass() { Bar = SomeBarValue };
+            default:
+                return new SomeISerializableClass()
+                {
+                    /* At your criteria - perhaps nothing here, or perhaps a default "full" initialization */
+                };
+        }
+    }
+    
+    protected abstract SpawnType GetFullData(ulong connection) 
+    {
+        // This is the same logic: For a connection here, return the
+        // data. Although it'd be typically the same object for each
+        // input connection.
+        return new SomeISerializableClass() 
+        {
+            // ... a complete initialization here ...
+        }
+    }
+    
+    // The other methods are already implemented. For example: If always
+    // returning the _same_ object instance, then it'll be grouped for
+    // all the connections to have the same. Grouping is automatically
+    // done by object instance / identity.
+}
+```
+
+And for the client classes looks like this:
+
+```csharp
+using AlephVault.Unity.Meetgard.Scopes.Authoring.Behaviours.Client;
+using AlephVault.Unity.Binary;
+
+class MyModelServerSide : ModelClientSide<SomeISerializableClass> 
+{
+    protected void UpdateFrom(RefreshType refreshData)
+    {
+        // Implement the logic to fully update the object
+        // from partial data, properly detecting the missing
+        // or null fields.
+    }
+    
+    protected void InflateFrom(SpawnType fullData)
+    {
+        // Implement the logic to fully update the object
+        // from full data.
+    }
+}
+```
+
+With this, the objects are ready to be synchronized when they're used.
 
 ### Installing the objects in the protocol
 
