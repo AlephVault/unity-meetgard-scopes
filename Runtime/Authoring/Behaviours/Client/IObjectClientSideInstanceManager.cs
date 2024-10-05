@@ -16,8 +16,8 @@ namespace AlephVault.Unity.Meetgard.Scopes
             namespace Client
             {
                 /// <summary>
-                ///   An interfact for instance management (to avoid
-                ///   having a lot instantiations/destructions).
+                ///   An interface for instance management (to avoid
+                ///   having a lot of instantiations/destructions).
                 /// </summary>
                 public interface IObjectClientSideInstanceManager
                 {

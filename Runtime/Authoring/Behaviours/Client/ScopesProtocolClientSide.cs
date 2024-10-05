@@ -440,7 +440,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                         }
                     }
 
-                    // Despawns an object. Returns the already despawned object.
+                    // De-spawns an object. Returns the already de-spawned object.
                     private ObjectClientSide Despawn(uint objectId)
                     {
                         XDebug debugger = new XDebug("Meetgard.Scopes", this, $"Despawn({objectId})", debug);

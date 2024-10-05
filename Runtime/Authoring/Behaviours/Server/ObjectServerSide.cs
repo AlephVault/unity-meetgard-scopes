@@ -43,7 +43,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///   An optional key to be used. This is only meaningful
                     ///   if the object this key is assigned to, is actually a
                     ///   prefab object inside a specific server. When this
-                    ///   value is set (in constrast to null or ""), it will be
+                    ///   value is set (in contrast to null or ""), it will be
                     ///   added to an internal dictionary of prefabs by their
                     ///   keys, and thus be available to be instantiated via
                     ///   a method taking its key instead of its index.
@@ -81,10 +81,12 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     /// <summary>
                     ///   If the object is spawned, this field will have which
                     ///   scope this object is spawned into. If the object belongs
-                    ///   to a server but it is not spawned, this value will be
+                    ///   to a server, but if is not spawned, this value will be
                     ///   null. When this value is set, the <see cref="Id"/> field
-                    ///   will have a meaninful value: the id this object was given
-                    ///   when spawning this object (and also populating this field).
+                    ///   will have a meaningful value: the spawning process sets
+                    ///   this value to some sort of unique value telling that it
+                    ///   is spawned and how to track it when synchronizing to the
+                    ///   clients.
                     /// </summary>
                     public ScopeServerSide Scope { get; internal set; }
 
@@ -102,7 +104,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     public event Func<Task> OnAfterSpawned = null;
 
                     /// <summary>
-                    ///   Triggered when the object is despawned from the
+                    ///   Triggered when the object is de-spawned from the
                     ///   last scope. By this point, the object will not
                     ///   have any sort of scope association information.
                     /// </summary>
@@ -111,7 +113,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     /// <summary>
                     ///   Triggered before the object despawn is fully.
                     ///   Additional logic will take place with a still spawned,
-                    ///   yet about to be despawned, object.
+                    ///   yet about to be de-spawned, object.
                     /// </summary>
                     public event Func<Task> OnBeforeDespawned = null;
 
@@ -119,8 +121,8 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///   Returns the data of this object to synchronize for the
                     ///   connections. Each set of connection might receive a custom
                     ///   data set for this object. Warning: Both client and server
-                    ///   must agree on the data type and it must be the same in
-                    ///   all of the entries, save for certain fields which can be
+                    ///   must agree on the data type, and it must be the same in
+                    ///   all the entries, save for certain fields which can be
                     ///   "censored" to null or empty (the data type itself must
                     ///   tolerate this).
                     /// </summary>
@@ -155,13 +157,13 @@ namespace AlephVault.Unity.Meetgard.Scopes
 
                     /// <summary>
                     ///   Returns the data of this object to synchronize for the
-                    ///   connection, given a certain context. Typically it will,
+                    ///   connection, given a certain context. Typically, it will,
                     ///   like in <see cref="FullData(ulong)"/> method, return the
                     ///   full object data, but only when the given context is one
-                    ///   that matters for the object itslf. Otherwise, it returns
+                    ///   that matters for the object itself. Otherwise, it returns
                     ///   null (meaning: given the current context, there is nothing
                     ///   to refresh). Warning: Both client and server must agree on
-                    ///   the data type and it must be the same in all the possible
+                    ///   the data type, and it must be the same in all the possible
                     ///   cases this function might return, save for the fact that
                     ///   some fields in the result might become "censored" to null
                     ///   or empty. 
@@ -191,7 +193,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                         if (Scope != null) Scope.RemoveObject(this);
                     }
 
-                    // When a parent changes, this object must retrack itself to find
+                    // When a parent changes, this object must re-track itself to find
                     // the scope it belongs to.
                     protected void OnTransformParentChanged()
                     {

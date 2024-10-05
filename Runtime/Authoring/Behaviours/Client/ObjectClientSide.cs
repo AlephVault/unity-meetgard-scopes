@@ -79,7 +79,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     public event Action<ISerializable> OnRefreshed;
 
                     /// <summary>
-                    ///   What to do when the object is despawned.
+                    ///   What to do when the object is de-spawned.
                     /// </summary>
                     public event Action OnDespawned;
 
@@ -144,7 +144,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     protected abstract void ReadSpawnData(byte[] data);
 
                     /// <summary>
-                    ///   Despawns the object. Only valid when the object is already
+                    ///   De-spawns the object. Only valid when the object is already
                     ///   spawned.
                     /// </summary>
                     internal void Despawn()
