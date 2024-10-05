@@ -35,7 +35,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///   </para>
                     ///   <para>
                     ///     It raises an error when the prefab id is not valid (i.e.
-                    ///     outside the [0 .. prefabs.Length) range).
+                    ///     outside the [0..prefabs.Length) range).
                     ///   </para>
                     /// </summary>
                     /// <param name="prefabId">The index of the prefab to instantiate</param>
@@ -66,7 +66,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///     null, empty, or unknown among the registered object prefabs).
                     ///   </para>
                     /// </summary>
-                    /// <param name="prefab">The key of the prefab to instantiate</param>
+                    /// <param name="key">The key of the prefab to instantiate</param>
                     /// <returns>The object instance</returns>
                     public ObjectServerSide InstantiateHere(string key)
                     {

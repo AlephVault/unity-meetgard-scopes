@@ -86,8 +86,8 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     /// </summary>
                     public event Action<uint, ScopeServerSide, System.Exception> OnUnloadError = null;
 
-                    // Loads all of the default scopes. For each attempted entry,
-                    // one instance will be added to the loaded scopes. Such instance
+                    // Loads all the default scopes. For each attempted entry, one
+                    // instance will be added to the loaded scopes. Such instance
                     // will not just be instantiated but also initialized (e.g. its
                     // data being loaded from database). Any exception raised here
                     // will cause all the scopes to be unloaded and the server to be
@@ -113,7 +113,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                         debugger.End();
                     }
 
-                    // Unloads all of the loaded scopes, one by one. This may involve
+                    // Unloads all the loaded scopes, one by one. This may involve
                     // things like storing the last scope state back into database and
                     // that sort of things, in a per-scope basis. Any exception that
                     // occurs in this process will be handled in a per-scope basis.
@@ -285,7 +285,6 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///   come from a configurable source (i.e. editor, authoring) and not
                     ///   a constant or hard-coded value in the codebase
                     /// </param>
-                    /// <param name="init">A function to initialize the scope to be loaded</param>
                     /// <returns>The loaded (and registered) scope instance</returns>
                     public Task<ScopeServerSide> LoadExtraScope(string extraScopePrefabKey)
                     {

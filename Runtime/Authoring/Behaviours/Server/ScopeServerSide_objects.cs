@@ -36,7 +36,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     public event Func<ObjectServerSide, Task> OnSpawned = null;
 
                     /// <summary>
-                    ///   Triggered when an object is despawned from the
+                    ///   Triggered when an object is de-spawned from the
                     ///   last scope. By this point, the object will not
                     ///   have any sort of scope association information.
                     /// </summary>
@@ -60,7 +60,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                         target.Scope = null;
                     }
 
-                    // Broadcasts the object's data to all of the available
+                    // Broadcasts the object's data to all the available
                     // connections in the scope.
                     private void NotifyObjectSpawnedToEveryone(ObjectServerSide target)
                     {
@@ -114,7 +114,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///     from the object itself, on hierarchy change.
                     ///   </para>
                     /// </summary>
-                    /// <param name="obj">The object to add</param>
+                    /// <param name="target">The object to add</param>
                     public Task AddObject(ObjectServerSide target)
                     {
                         // If there is no protocol, this scope is unloaded. It makes no sense
@@ -189,7 +189,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///     from the object itself, on hierarchy change.
                     ///   </para>
                     /// </summary>
-                    /// <param name="obj">The object to remove</param>
+                    /// <param name="target">The object to remove</param>
                     public Task RemoveObject(ObjectServerSide target)
                     {
                         // If there is no protocol, this scope is unloaded. It makes no sense
@@ -253,6 +253,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///   that belong to the same scope.
                     /// </summary>
                     /// <param name="target">The object to refresh</param>
+                    /// <param name="context">The refresh context</param>
                     public Task RefreshExistingObject(ObjectServerSide target, string context)
                     {
                         return Protocol.RunInMainThread(async () =>

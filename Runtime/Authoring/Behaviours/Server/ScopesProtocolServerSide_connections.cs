@@ -24,7 +24,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
 
                     /// <summary>
                     ///   This event is triggered when a new connection arrived and was
-                    ///   set to the limbo in that moment.
+                    ///   set to the limbo at that moment.
                     /// </summary>
                     public event Func<ulong, Task> OnWelcome = null;
 

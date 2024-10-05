@@ -41,10 +41,10 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     internal Func<IEnumerable<ulong>, ObjectRefreshed, Dictionary<ulong, Task>> BroadcastObjectRefreshed;
 
                     // A broadcaster for the ObjectDespawned message.
-                    // Use case: when an object despawns, for each connection.
+                    // Use case: when an object de-spawns, for each connection.
                     internal Func<IEnumerable<ulong>, ObjectDespawned, Dictionary<ulong, Task>> BroadcastObjectDespawned;
 
-                    // These functions are somewhat auxiliar and build on top of the
+                    // These functions are somewhat auxiliary and build on top of the
                     // message senders and broadcasters, when needed. In particular,
                     // these stand to object synchronization.
 
