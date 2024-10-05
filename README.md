@@ -111,6 +111,8 @@ It must be remembered that scopes by themselves _do not synchronize custom data 
 3. Additionally from that, _nothing else is synchronized from the server_. The scope might have its own detail and objects matching from the server into the clients, and the clients must have all the relevant information to represent the scope.
    1. If, by chance, there's something else to synchronize, there are particular events that can be implemented to detect a connection entering a server-side scope and then doing whatever is needed (e.g. manually sending a custom message that synchronizes more data).
 
+## Creating the objects
+
 ### Creating the objects assets
 
 This part is tricky. Object assets must also be properly defined with a client-side part and a server-side part.
@@ -374,6 +376,23 @@ class MyModelServerSide : ModelClientSide<SomeISerializableClass>
 
 With this, the objects are ready to be synchronized when they're used.
 
+**Hint**: The prefabs can have a `Prefab Key`. When settings this, prefabs where such field is set can also be referenced by their `Prefab Key` (the idea is to set a useful name there).
+
 ### Installing the objects in the protocol
 
-# TODO explain here
+Once both server-side object prefabs and client-side objects prefabs are there, it's time to install them. This have to be done _for each pair of objects_:
+
+1. Having the client-side prefab of the object, add it to the client object: in the `ScopesProtocolClientSide` component, in the `Object Prefabs` property, at a new index.
+2. Having the server-side prefab of the object, add it to the server object: in the `ScopesProtocolServerSide` component, in the `Object Prefabs` property, at a new index.
+
+Also, _remember both indices_ (in this example: just 0 and 1) for they'll be useful when creating. __The indices must always match__ between client and server for each single object.
+
+## Bonus: Creating extra scopes
+
+The server and client sides can define `extra scopes` (by adding matching scope objects at the same indices). As long as matching objects are defined on each bound at the same index, they can be used to be loaded as dynamic scopes.
+
+Extra scopes can be loaded anywhere between the server being launched and the server being stopped. They can also be unloaded (and all their connections are moved to a special `Limbo` scope) freely. All the remaining loaded dynamic/extra scopes will be unloaded when the server stops.
+
+## How to interact with the scopes and objects
+
+# TODO explain this.
