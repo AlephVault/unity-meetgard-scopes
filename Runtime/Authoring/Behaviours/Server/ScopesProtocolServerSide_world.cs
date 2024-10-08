@@ -397,9 +397,9 @@ namespace AlephVault.Unity.Meetgard.Scopes
                             debugger.Info("Checking scope instance");
                             if (scope == null)
                             {
-                                throw new ArgumentNullException("scope");
+                                throw new ArgumentNullException(nameof(scope));
                             }
-                            else if (scope.Protocol != this)
+                            if (scope.Protocol != this)
                             {
                                 throw new ArgumentException("The given scope does not belong to this server - it cannot be deleted");
                             }
