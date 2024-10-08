@@ -126,7 +126,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                             debugger.Info("Checking parameters and status");
 
                             // Null/Destroyed objects cannot be added.
-                            if (target == null) throw new ArgumentNullException("target");
+                            if (target == null) throw new ArgumentNullException(nameof(target));
 
                             // Objects in a different protocol cannot be added.
                             if (target.Protocol != Protocol) throw new ArgumentException("The target to add was not created with the same protocol instance");
@@ -150,7 +150,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                             RegisterObject(target);
 
                             // Then, trigger the event for the object.
-                            // The objects will prepare themselved on spawn.
+                            // The objects will prepare themselves on spawn.
                             // (e.g. initialize per-spawn data).
                             debugger.Info("Notifying locally (to the object)");
                             await (target.TriggerOnSpawned() ?? Task.CompletedTask);
