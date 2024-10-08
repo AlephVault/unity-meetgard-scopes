@@ -529,3 +529,25 @@ So far, these 4 methods are entirely optional and a game can be developed withou
 There are two more methods here: `Objects()` is an enumerable over the current in-scope objects, and `Connections(except = null)` is an enumerable over the current in-scope connections (perhaps: except some specified connections).
 
 __Please note__: Adding and removing objects will only work when the object belongs to the same protocol of the scope. Otherwise, weird errors will occur.
+
+#### Client-side scopes
+
+The client-side of each scope does not have a way to be managed (it does not make sense) but, instead, it provides a set of events to tell what's going on:
+
+```csharp
+public event Action OnLoad;
+public event Action OnUnload;
+```
+
+It's first useful to have an explanation: A connection can only belong to _one and only one scope_. When a connection is moved to another scope in the server, a synchronization message is sent to the endpoint client to change to that scope.
+
+The client, then, proceeds to unload whatever scope is loaded (if any) and then proceeds to load whatever scope is required (if any).
+
+With this in mind, when a scope client side is loaded, it's first created and registered and _then_ the `OnLoad` event is triggered. By this point, the `OnLoad`ed scope is empty, and later it will receive all the child objects. However, by this point it receives no particular configuration: It's up to the server-side's `OnJoined`, in that case, to send custom messages to the client connection so they get how to properly refresh the just-loaded scope.
+
+In contrast, `OnUnload` is invoked when the scope was told to unload. There's no particularly needed explanation or caveat here.
+
+
+
+
+
