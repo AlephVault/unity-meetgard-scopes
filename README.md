@@ -391,8 +391,141 @@ Also, _remember both indices_ (in this example: just 0 and 1) for they'll be use
 
 The server and client sides can define `extra scopes` (by adding matching scope objects at the same indices). As long as matching objects are defined on each bound at the same index, they can be used to be loaded as dynamic scopes.
 
+Registered extra scopes' prefabs **must** have a value set in their `Prefab Key` (in the server-side) property before being registered as extra scopes. Also, **the values must be unique** among all the registered extra scopes prefabs. This key will be used to instantiate them.
+
 Extra scopes can be loaded anywhere between the server being launched and the server being stopped. They can also be unloaded (and all their connections are moved to a special `Limbo` scope) freely. All the remaining loaded dynamic/extra scopes will be unloaded when the server stops.
 
 ## How to interact with the scopes and objects
 
-# TODO explain this.
+### Accessing the scopes
+
+The `ScopesProtocolServerSide` class has ways to access the scopes, which involves:
+
+- Accessing the static scopes.
+- Loading a dynamic scope.
+- Accessing the dynamic scopes.
+- Unloading a dynamic scope.
+
+Let's say that `ScopesProtocolServerSide protocol` is an assigned variable of that protocol in the server side for the purpose of these examples.
+
+To get one of the static scopes out of a given valid `index`, simply access: `ScopeServerSide scope = protocol.LoadedScopes[index];`. This is a read-only dictionary (accessing an invalid index will raise the same `KeyNotFoundException` and so).
+
+To get one of the dynamic scopes out of a given valid `index`, the process is the same. There's no difference on where the scopes are stored, being them dynamic or static. However, each scope has some properties:
+
+```csharp
+ScopeServerSide scope = protocol.LoadedScopes[index];
+
+// scope.PrefabKey contains a key that only makes sense for extra scopes PREFABS.
+string prefabKey = scope.PrefabKey;
+
+// scope.PrefabId contains the id of a prefab used to instantiate this scope.
+// This value is meaningful for the loaded extra scopes only: it will be the
+// index 0..N-1 of the extra scope prefab registered in the protocol.
+// For default scopes, this value is AlephVault.Unity.Meetgard.Scopes.Types.Constants.Scope.DefaultPrefab.
+// That's the canonical way to tell whether the scope is static or dynamic.
+uint prefabId = scope.PrefabId;
+
+// The id of the scope. It will be unique. If there are M registered default
+// scopes in the protocol, when prefabId == ...DefaultPrefab, thus making the
+// scope a default one, this value will be 0..M-1, matching the index of the
+// default prefab used to instantiate it.
+uint id = scope.Id;
+
+// Tells whether the scope is a default one.
+bool isDefault = scope.IsDefaultScope;
+
+// Tells whether the scope is an extra one (complements the .IsDefaultScope).
+bool isExtra = scope.IsExtraScope;
+
+// Gets the protocol that instantiated this scope. It will match the `protocol`
+// instance in this example.
+ScopesProtocolServerSide protocol_ = scope.Protocol;
+
+// Tells whether the scope is ready. A scope is ready when it's initialized.
+// The initialized scope can be manipulated.
+bool ready = scope.Ready;
+```
+
+In order to load and unload extra scopes, and considering that `Prefab Key` is a mandatory property in the extra prefabs, these methods can be used to load/unload them:
+
+```csharp
+// Loads a scope.
+ScopeServerSide scope = await protocol.LoadExtraScope("SomePrefabKey", (scope_) => { /* Set some data on scope_ */ });
+
+// Unloads an extra scope.
+await UnloadExtraScope(scope); // Unloads and destroys the object.
+await UnloadExtraScope(scope, true); // Unloads and destroys the object.
+await UnloadExtraScope(scope, false); // Unloads but does not destroy the object, if for some reason is needed. The users must manually invoke Destroy(scope.gameObject) when they think it's time to.
+```
+
+Given a valid `"SomePrefabKey"` which must be valid among the `Prefab Key` of all the registered extra scope prefabs, `LoadExtraScope` picks the corresponding prefab and instantiates it. The callback to initialize the scope (second argument) is totally optional but recommended, since it allows to customize the scope before it's being added and loaded into the list of loaded scopes.
+
+In contrast, `UnloadExtraScope` takes the duty of removing a scope from the list of loaded scopes (it essentially unloads it) and then, perhaps (and by default), destroys the entire scope game object.
+
+#### Server-side scopes
+
+Also, server-side scopes have some useful event that can be attended. These are mainly intended to be invoked from other behaviours in the scope object:
+
+```csharp
+public event Func<Task> OnLoad = null;
+```
+
+The `OnLoad` event is triggered when the scope is loaded (either as default or extra scope). The scope is now `Ready` and typically users would want to initialize it / create inner objects or related stuff.
+
+```csharp
+public event Func<Task> OnUnload = null;
+```
+
+The `OnUnload` is the opposite of the `OnLoad`. The idea is that by this point all the connections were just kicked (i.e. sent to Limbo) but the scope is not yet removed (but being removed). Users must ensure the logic is small and, in the meantime, the game server will not move any connection inside this scope.
+
+```csharp
+public event Func<ulong, Task> OnJoining = null;
+public event Func<ulong, Task> OnLeaving = null;
+public event Func<ulong, Task> OnGoodBye = null;
+```
+
+These three events are triggered while the scope is already loaded. For the three callback, the only argument is the id of the connection. The callbacks mean:
+
+1. A new connection just joined the scope. It's registered as belonging to its new scope.
+2. A connection just left the scope. By this point, _it's unsafe to try to change the scope again or the object's parent_. Just use this method to modify the object's data or something like that.
+3. A connection just terminated. Make some proper cleanups here, if any.
+
+Finally, there are object-related events:
+
+```csharp
+public event Func<ObjectServerSide, Task> OnSpawned = null;
+```
+
+The `OnSpawned` event tells that an object has just spawned into this scope. Perhaps the object already existed from other scopes, limbo, or plain initialization but the point is that it just entered this scope.
+
+```csharp
+public event Func<ObjectServerSide, Task> OnDespawned = null;
+```
+
+The `OnDespawned` event tells that the object has just de-spawned from this scope. It does necessarily mean it was destroyed, however.
+
+Finally, scopes also have a set of methods that can be used:
+
+```csharp
+public Task AddObject(ObjectServerSide target);
+public Task RemoveObject(ObjectServerSide target);
+public Task RefreshExistingObject(ObjectServerSide target, string context);
+public Task RefreshExistingObjectsTo(ulong connection, string context);
+public IEnumerable<ObjectServerSide> Objects();
+public IEnumerable<ulong> Connections(ISet<ulong> except = null);
+```
+
+`AddObject` manually changes an object which belonged to no scope at all to now belong to this scope (this also involves making the object a _child_ of the scope's transform). It is an error if the object is destroyed, not initialized, or belongs to another real scope.
+`RemoveObject` manually changes an object which belonged to a scope to now have no scope (i.e. it moves it to Limbo scope and, in terms of hierarchy, moves it to the root).
+
+However, `AddObject` and `RemoveObject` are not needed to be called explicitly: Changing the object's hierarchy (e.g. taking it from one scope and moving it to the other by calling `transform.SetParent(anotherTransform)`) will automatically trigger this behaviour if either the source is a scope or the target it.
+
+`RefreshExistingObject` is a special method that tells, to all the connections in the same scope, that certain object (which **must** belong to the scope) is being refreshed in certain _context_. Each object knows how to generate refresh data based on a _context_ (it was detailed in earlier sections).
+
+Finally, `RefreshExistingObjectsTo` is another special method that tells, to a single connection in the same scope, all the updates that correspond to all the objects present here in some particular context. This method is quite particular and there might be cases when it's not useful to invoke them (especially if not all the objects understand the same arbitrary context strings).
+
+So far, these 4 methods are entirely optional and a game can be developed without invoking them.
+
+There are two more methods here: `Objects()` is an enumerable over the current in-scope objects, and `Connections(except = null)` is an enumerable over the current in-scope connections (perhaps: except some specified connections).
+
+__Please note__: Adding and removing objects will only work when the object belongs to the same protocol of the scope. Otherwise, weird errors will occur.

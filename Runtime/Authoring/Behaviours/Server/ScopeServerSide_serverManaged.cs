@@ -37,7 +37,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                             Debug.LogException(e);
                             Debug.LogError(
                                 $"An error of type {e.GetType().FullName} has occurred in scope server side's OnLoad event. " +
-                                $"If the exceptions are not properly handled, the game state might be inconsistent. "
+                                $"If the exceptions are not properly handled, the game state might be inconsistent."
                             );
                         }) ?? Task.CompletedTask);
                         debugger.End();

@@ -285,8 +285,13 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///   come from a configurable source (i.e. editor, authoring) and not
                     ///   a constant or hard-coded value in the codebase
                     /// </param>
+                    /// <param name="initialize">
+                    ///   An optional callback to provide to pre-initialize the object.
+                    ///   This callback will allow the user to set data in the object itself,
+                    ///   before its <see cref="ScopeServerSide.OnLoad" /> is triggered.
+                    /// </param>
                     /// <returns>The loaded (and registered) scope instance</returns>
-                    public Task<ScopeServerSide> LoadExtraScope(string extraScopePrefabKey)
+                    public Task<ScopeServerSide> LoadExtraScope(string extraScopePrefabKey, Action<ScopeServerSide> initialize = null)
                     {
                         return RunInMainThread(async () =>
                         {
@@ -313,6 +318,19 @@ namespace AlephVault.Unity.Meetgard.Scopes
 
                             debugger.Info("Instantiating extra scope");
                             ScopeServerSide instance = Instantiate(extraScopePrefabs[extraScopePrefabIndex], null, true);
+                            try
+                            {
+                                initialize?.Invoke(instance);
+                            }
+                            catch (System.Exception e)
+                            {
+                                Debug.LogException(e);
+                                Debug.LogError(
+                                    $"An error of type {e.GetType().FullName} has occurred in scope server side's pre-initialization. " +
+                                    "If the exceptions are not properly handled, the game state might be inconsistent."
+                                );
+                                throw;
+                            }
                             debugger.Info("Assigning ID to the extra scope");
                             uint newId = (uint)loadedScopesIds.Next();
                             instance.Id = newId;
