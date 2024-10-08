@@ -108,7 +108,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                             instance.Protocol = this;
                             debugger.Info($"Registering it with id: {newId}");
                             loadedScopes.Add(newId, instance);
-                            await instance.Load();
+                            await instance.TriggerOnLoad();
                         }
                         debugger.End();
                     }
@@ -130,7 +130,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                                     debugger.Info($"Clearing connections from scope: {pair.Key}");
                                     await ClearConnectionsFromScope(pair.Value);
                                     debugger.Info($"Unloading scope: {pair.Key}");
-                                    await pair.Value.Unload();
+                                    await pair.Value.TriggerOnUnload();
                                 }
                                 catch (System.Exception e)
                                 {
@@ -320,7 +320,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                             instance.Protocol = this;
                             loadedScopes.Add(newId, instance);
                             debugger.Info("Delegating load");
-                            await instance.Load();
+                            await instance.TriggerOnLoad();
                             debugger.End();
                             return instance;
                         });
@@ -334,7 +334,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                         debugger.Info("Clearing connections");
                         await ClearConnectionsFromScope(scopeToUnload);
                         debugger.Info("Delegating unload");
-                        await scopeToUnload.Unload();
+                        await scopeToUnload.TriggerOnUnload();
                         debugger.Info("Resetting ID");
                         loadedScopes.Remove(scopeId);
                         loadedScopesIds.Release(scopeId);

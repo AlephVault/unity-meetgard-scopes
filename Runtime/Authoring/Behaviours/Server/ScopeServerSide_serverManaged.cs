@@ -28,7 +28,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///   Initializes the scope. Typically, this invokes
                     ///   registered callbacks to work.
                     /// </summary>
-                    internal async Task Load()
+                    internal async Task TriggerOnLoad()
                     {
                         XDebug debugger = new XDebug("Meetgard.Scopes", this, "Load()", debug);
                         debugger.Start();
@@ -47,7 +47,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///   Finalizes the scope. Typically, this invokes
                     ///   registered callbacks to work.
                     /// </summary>
-                    internal async Task Unload()
+                    internal async Task TriggerOnUnload()
                     {
                         XDebug debugger = new XDebug("Meetgard.Scopes", this, "Unload()", debug);
                         debugger.Start();
