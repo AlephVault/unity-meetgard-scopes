@@ -57,6 +57,20 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///   ones, of the underlying server.
                     /// </summary>
                     public uint PrefabId { get; internal set; }
+                    
+                    /// <summary>
+                    ///   Tells whether this scope is loaded as a
+                    ///   default scope (i.e. loaded from one of
+                    ///   the default scope prefabs).
+                    /// </summary>
+                    public bool IsDefaultScope => PrefabId == Scope.DefaultPrefab;
+                    
+                    /// <summary>
+                    ///   Tells whether this scope is loaded as an
+                    ///   extra scope (i.e. loaded from one of the
+                    ///   extra scope prefabs).
+                    /// </summary>
+                    public bool IsExtraScope => PrefabId != Scope.DefaultPrefab;
 
                     /// <summary>
                     ///   The ID of this scope. It is always >= 1.
