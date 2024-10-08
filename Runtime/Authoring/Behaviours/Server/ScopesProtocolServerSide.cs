@@ -35,7 +35,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     /// <summary>
                     ///   List of the prefabs that will be used to instantiate scopes.
                     ///   This list is mapped 1:1 with the scopes they instantiate,
-                    ///   being those stored in <see cref="defaultScopes"/>. Clients
+                    ///   being those stored in <see cref="loadedScopes"/>. Clients
                     ///   must register corresponding prefabs in an 1:1 basis on their
                     ///   sides for things go ok with synchronization. The key in these
                     ///   prefabs will be ignored, if set.

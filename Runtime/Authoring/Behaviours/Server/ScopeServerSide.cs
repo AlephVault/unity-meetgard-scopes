@@ -44,7 +44,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     private string prefabKey;
 
                     /// <summary>
-                    ///   See <see cref="key"/>.
+                    ///   See <see cref="prefabKey"/>.
                     /// </summary>
                     public string PrefabKey => prefabKey;
 
