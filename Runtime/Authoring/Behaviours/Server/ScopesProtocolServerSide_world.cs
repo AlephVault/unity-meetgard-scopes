@@ -254,8 +254,8 @@ namespace AlephVault.Unity.Meetgard.Scopes
                         // Set the initial, in-progress, status.
                         WorldLoadStatus = LoadStatus.Unloading;
 
-                        // Unload all of the scopes. Any exception
-                        // will be handled and/or diapered separately.
+                        // Unload all the scopes. Any exception will
+                        // be handled and/or diapered separately.
                         await UnloadScopes();
 
                         // Destroy the already unloaded scopes. In the
