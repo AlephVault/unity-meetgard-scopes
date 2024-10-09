@@ -226,7 +226,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                             await (target.TriggerOnBeforeDespawned() ?? Task.CompletedTask);
 
                             // Finally, unregister the object, and broadcast.
-                            debugger.Info("Notifying the object being despawned");
+                            debugger.Info("Notifying the object being de-spawned");
                             NotifyObjectDespawnedToEveryone(target);
 
                             // In the end, trigger the event for the object.
