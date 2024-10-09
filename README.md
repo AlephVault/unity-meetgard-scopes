@@ -710,3 +710,77 @@ ObjectServerSide obj2 = protocol.InstantiateHere("somePrefabKey", callback);
 ObjectServerSide obj2 = protocol.InstantiateHere(somePrefabReference, callback);
 ```
 
+#### Properties and methods of the objects
+
+##### For the server-side
+
+```csharp
+public uint PrefabId { get; internal set; }
+```
+
+`PrefabId` tells the id (index) of the prefab being used to instantiate it.
+
+```csharp
+public string PrefabKey { get; };
+```
+
+`PrefabKey` only makes sense for the prefabs, not the instances. This is optional and allows the objects to be instantiated from this prefab by the specified string key.
+
+```csharp
+public ScopesProtocolServerSide Protocol { get; internal set; }
+```
+
+`Protocol` is the protocol instance. Properly protocol-instantiated objects will have this protocol set, which will be the protocol that instantiated the object.
+
+```csharp
+public uint Id { get; internal set; }
+```
+
+`Id` is the id assigned to this object when it was protocol-instantiated.
+
+```csharp
+public ScopeServerSide Scope { get; internal set; }
+```
+
+`Scope` is the current scope this object is spawned into. If on maintenance or limbo, this value will be null.
+
+```csharp
+public Task Refresh(string context = "")
+```
+
+`Refresh` refreshes the current object, to all the connections, using the specified scope.
+
+```csharp
+public Task RefreshTo(ulong connection, string context = "")
+```
+
+`RefreshTo` does the same, but only for a specific connection.
+
+###### Events:
+
+```csharp
+public event Func<Task> OnSpawned = null;
+```
+
+This `OnSpawned` event is triggered when the object is spawned into a scope.
+
+```csharp
+public event Func<Task> OnAfterSpawned = null;
+```
+
+This `OnAfterSpawned` event is triggered _after_ the object was spawned _and notified to all the connections in the scope_.
+
+```csharp
+public event Func<Task> OnBeforeDespawned = null;
+```
+
+This `OnBeforeDespawned` event is triggered when the object is de-spawning (and probably it's not under the transform hierarchy of the source scope anymore) but did not notify every connection yet.
+
+```csharp
+public event Func<Task> OnDespawned = null;
+```
+
+This `OnDespawned` event is triggered when the object completed de-spawning and notifying the connections.
+
+##### For the client-side
+
