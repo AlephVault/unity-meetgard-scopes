@@ -581,6 +581,8 @@ This `OnUnloadComplete` event is triggered when the default scopes are completel
 
 #### Protocol connection events
 
+##### On server-side
+
 ```csharp
 public event Func<ulong, Task> OnWelcome = null;
 ```
@@ -645,6 +647,43 @@ This `OnLocalError` event is triggered when a local error occurred in the client
 
 - InvalidServerScope, ScopeMismatch and ScopeLoadError refers to some sort of mismanagement of the scope.
 - SpawnError, RefreshError and DespawnError refers to some sort of mismanagement of the objects in the scope.
+- Future developments by any user can use any string they want, however (those 6 strings are used by this library and are only purely informative).
+
+#### Useful properties and methods in the protocol
+
+##### On server-side
+
+```csharp
+// Sends a connection to a new scope.
+public Task SendTo(ulong connectionId, uint newScopeId, bool force = false);
+
+// Sends a connection to the Limbo scope.
+public Task SendToLimbo(ulong connectionId);
+```
+
+`SendTo` sends a given connection (by its id) to a new scope, which can even be `Scope.Limbo` or `Scope.Maintenance`. The `force` flag is used to tell that the relevant events and changes should occur even if the current scope is the same as the target scope. An error will be triggered if the scope by the index does not exist.
+
+`SendToLimbo` is just a convenience over `SendTo` which passes `Scope.Limbo` as argument.
+
+##### On client-side
+
+```csharp
+public async Task<bool> RequireIsCurrentScopeAndHoldsObjects(uint scopeIndex);
+```
+
+This `RequireIsCurrentScopeAndHoldsObjects` just checks that the current scope is the one specified and, if it's not, then triggers a local error out of it and closes the connection.
+
+```csharp
+public ScopeClientSide CurrentScope { get; private set; }
+```
+
+This `CurrentScope` property tells the current scope the object is in. If `null`, it will be either in `Limbo` or `Maintenance` scopes.
+
+```csharp
+public uint CurrentScopeId { get; private set; }
+```
+
+This `CurrentScopeId` property tells the id of the current scope the object is in. It might also be `Scope.Limbo` or `Scope.Maintenance`.
 
 ### Dynamically creating objects
 
