@@ -462,6 +462,34 @@ Given a valid `"SomePrefabKey"` which must be valid among the `Prefab Key` of al
 
 In contrast, `UnloadExtraScope` takes the duty of removing a scope from the list of loaded scopes (it essentially unloads it) and then, perhaps (and by default), destroys the entire scope game object.
 
+#### Protocol life-cycle callbacks
+
+There are some callbacks that are useful to be attended, regarding the life-cycle.
+
+```csharp
+public event Action<System.Exception> OnLoadError = null;
+```
+
+This `OnLoadError` is triggered when there was an error loading one of the default scopes. After this event is handled, the server will close.
+
+```csharp
+public event Action OnLoadComplete = null;
+```
+
+This `OnLoadComplete` is triggered when the set of default scopes was successfully loaded. Ensure no exception is triggered here, or the server will stop.
+
+```csharp
+public event Action<uint, ScopeServerSide, System.Exception> OnUnloadError = null;
+```
+
+This `OnUnloadError` event is triggered for one specific scope raising an error when being unloaded, passing id, scope instance and the exception.
+
+```csharp
+public event Action OnUnloadComplete = null;
+```
+
+This `OnUnloadComplete` event is triggered when the default scopes are completely loaded. Ensure no exception is triggered here.
+
 #### Server-side scopes
 
 Also, server-side scopes have some useful event that can be attended. These are mainly intended to be invoked from other behaviours in the scope object:
@@ -547,7 +575,28 @@ With this in mind, when a scope client side is loaded, it's first created and re
 
 In contrast, `OnUnload` is invoked when the scope was told to unload. There's no particularly needed explanation or caveat here.
 
+### Dynamically creating objects
 
+Objects are all of them created dynamically from the registered prefabs (_it is untested what happens when a scope being just-loaded already has instances of these registered objects prefabs in it_).
 
+Similar to the way the `ScopesProtocolServerSide protocol` object loads extra scopes, objects can be loaded, but with some differences:
 
+1. They're not a priori inserted into any parent scope.
+2. Selecting their source prefab can be done by `Prefab Key` (only for the objects that have a key) or its prefab index (not so recommended).
+
+```csharp
+Action<ObjectServerSide> callback = (obj) => { /* An optional callback to initialize the just-created and not-yet-spawned object */ };
+
+// Instantiate an object by the index of the prefab.
+// The callback argument is optional.
+ObjectServerSide obj = protocol.InstantiateHere(0, callback);
+
+// Instantiate an object by the prefab key, if a registered prefab has that key.
+// The callback argument is optional.
+ObjectServerSide obj2 = protocol.InstantiateHere("somePrefabKey", callback);
+
+// Instantiate an object by the prefab object itself, if that prefab objct is registered in the server protocol.
+// The callback argument is optional.
+ObjectServerSide obj2 = protocol.InstantiateHere(somePrefabReference, callback);
+```
 
