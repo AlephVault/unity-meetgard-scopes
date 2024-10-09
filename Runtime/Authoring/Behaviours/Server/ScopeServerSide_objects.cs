@@ -169,9 +169,9 @@ namespace AlephVault.Unity.Meetgard.Scopes
                             // when they are not ready, and errors will occur).
                             debugger.Info("Notifying the object being spawned");
                             NotifyObjectSpawnedToEveryone(target);
-                            // Finally, after the object is notified to all of
-                            // the existing connections in the scope, the object
-                            // can perform further "after spawn" logic.
+                            // Finally, after the object is notified to all the
+                            // existing connections in the scope, the object can
+                            // perform further "after spawn" logic.
                             debugger.Info("Notifying locally (to the object, after spawn");
                             await (target.TriggerOnAfterSpawned() ?? Task.CompletedTask);
                             debugger.End();
@@ -219,11 +219,11 @@ namespace AlephVault.Unity.Meetgard.Scopes
                                 target.transform.SetParent(transform.parent);
                             }
 
-                            // Initially, before the object is notified to all of
+                            // Initially, before the object is notified to all
                             // the existing connections in the scope, the object
                             // can perform previous "before despawn" logic.
                             debugger.Info("Notifying locally (to the object, before despawn");
-                            await (target.TriggerOnAfterSpawned() ?? Task.CompletedTask);
+                            await (target.TriggerOnBeforeDespawned() ?? Task.CompletedTask);
 
                             // Finally, unregister the object, and broadcast.
                             debugger.Info("Notifying the object being despawned");
