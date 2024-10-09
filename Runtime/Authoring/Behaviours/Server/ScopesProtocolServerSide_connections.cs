@@ -54,7 +54,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     /// </summary>
                     public event Func<ulong, uint, Task> OnGoodBye = null;
 
-                    // Clears all of the connections in a given scope.
+                    // Clears all the connections in a given scope.
                     private async Task ClearConnectionsFromScope(ScopeServerSide scope)
                     {
                         XDebug debugger = new XDebug("Meetgard.Scopes", this, $"ClearConnectionsFromScope({scope.Id})", debug);
@@ -156,8 +156,6 @@ namespace AlephVault.Unity.Meetgard.Scopes
                                 {
                                     debugger.Info($"Removing the connection from the scope");
                                     scope.connections.Remove(connectionId);
-                                    debugger.Info($"Notifying the connection left the scope and the game");
-                                    await scope.TriggerOnGoodBye(connectionId);
                                 };
                                 break;
                         }
