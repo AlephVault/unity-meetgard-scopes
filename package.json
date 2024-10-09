@@ -5,8 +5,8 @@
   "description": "An object synchronization and world partitioning mechanism based on meetgard.",
   "unity": "2020.1",
   "dependencies": {
-    "com.alephvault.unity.meetgard": "0.0.3",
-    "com.alephvault.unity.support.generic": "0.0.1"
+    "com.alephvault.unity.meetgard": "0.0.7",
+    "com.alephvault.unity.support.generic": "0.0.2"
   },
   "author": {
     "name": "Aleph Vault",
