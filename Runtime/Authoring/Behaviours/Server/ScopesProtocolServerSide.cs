@@ -62,20 +62,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     /// </summary>
                     [SerializeField]
                     private ObjectServerSide[] objectPrefabs;
-
-                    /// <summary>
-                    ///   This is the max size of the spawn data internal array. It is
-                    ///   typically related to <see cref="NetworkServer.maxMessageSize"/>
-                    ///   value, but discounting an overhead of 12 bytes.
-                    /// </summary>
-                    [SerializeField]
-                    private uint fullDataMaxSize = 1012;
-
-                    /// <summary>
-                    ///   See <see cref="fullDataMaxSize"/>.
-                    /// </summary>
-                    public uint FullDataMaxSize => fullDataMaxSize;
-
+                    
                     /// <summary>
                     ///   A dictionary key => index of the extra scope prefabs, so games
                     ///   can reference the extra maps by keys appropriately, which in
