@@ -1,6 +1,6 @@
 {
   "name": "com.alephvault.unity.meetgard.scopes",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "displayName": "Aleph Vault - Unity - Meetgard.Scopes",
   "description": "An object synchronization and world partitioning mechanism based on meetgard.",
   "unity": "2020.1",
