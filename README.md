@@ -756,7 +756,7 @@ public Task RefreshTo(ulong connection, string context = "")
 
 `RefreshTo` does the same, but only for a specific connection.
 
-###### Events:
+###### Events
 
 ```csharp
 public event Func<Task> OnSpawned = null;
@@ -782,5 +782,52 @@ public event Func<Task> OnDespawned = null;
 
 This `OnDespawned` event is triggered when the object completed de-spawning and notifying the connections.
 
+_Please note: when an object is destroyed, it is de-spawned_.
+
 ##### For the client-side
 
+```csharp
+public ScopesProtocolClientSide Protocol { get; internal set; }
+```
+
+Tells the current protocol that instantiated this object in the client side. Properly protocol-instantiated objects will have this value as not null.
+
+```csharp
+public uint Id { get; private set; }
+```
+
+This is the server-side assigned id for this object.
+
+```csharp
+public ScopeClientSide Scope { get; private set; }
+```
+
+The scope this object belongs to. Usually a reference to the currently loaded scope in the client.
+
+```csharp
+public bool Spawned { get; };
+```
+
+Tells whether this object belongs to a scope or not. Properly instantiated objects will return `true` here.
+
+###### Events
+
+```csharp
+public event Action OnSpawned;
+```
+
+This `OnSpawned` event is triggered when this object was just spawned.
+
+```csharp
+public event Action<ISerializable> OnRefreshed;
+```
+
+This `OnRefreshed` event is triggered when this object was just refreshed with some data.
+
+```csharp
+public event Action OnDespawned;
+```
+
+This `OnDespawned` event is triggered when this object was just de-spawned.
+
+_Please note: destroyed objects are also de-spawned_.
