@@ -462,34 +462,6 @@ Given a valid `"SomePrefabKey"` which must be valid among the `Prefab Key` of al
 
 In contrast, `UnloadExtraScope` takes the duty of removing a scope from the list of loaded scopes (it essentially unloads it) and then, perhaps (and by default), destroys the entire scope game object.
 
-#### Protocol life-cycle callbacks
-
-There are some callbacks that are useful to be attended, regarding the life-cycle.
-
-```csharp
-public event Action<System.Exception> OnLoadError = null;
-```
-
-This `OnLoadError` is triggered when there was an error loading one of the default scopes. After this event is handled, the server will close.
-
-```csharp
-public event Action OnLoadComplete = null;
-```
-
-This `OnLoadComplete` is triggered when the set of default scopes was successfully loaded. Ensure no exception is triggered here, or the server will stop.
-
-```csharp
-public event Action<uint, ScopeServerSide, System.Exception> OnUnloadError = null;
-```
-
-This `OnUnloadError` event is triggered for one specific scope raising an error when being unloaded, passing id, scope instance and the exception.
-
-```csharp
-public event Action OnUnloadComplete = null;
-```
-
-This `OnUnloadComplete` event is triggered when the default scopes are completely loaded. Ensure no exception is triggered here.
-
 #### Server-side scopes
 
 Also, server-side scopes have some useful event that can be attended. These are mainly intended to be invoked from other behaviours in the scope object:
@@ -574,6 +546,105 @@ The client, then, proceeds to unload whatever scope is loaded (if any) and then 
 With this in mind, when a scope client side is loaded, it's first created and registered and _then_ the `OnLoad` event is triggered. By this point, the `OnLoad`ed scope is empty, and later it will receive all the child objects. However, by this point it receives no particular configuration: It's up to the server-side's `OnJoined`, in that case, to send custom messages to the client connection so they get how to properly refresh the just-loaded scope.
 
 In contrast, `OnUnload` is invoked when the scope was told to unload. There's no particularly needed explanation or caveat here.
+
+### Managing the protocols
+
+#### Protocol life-cycle events
+
+##### On server-side
+
+There are some `ScopesProtocolServerSide` callbacks that are useful to be attended, regarding the life-cycle.
+
+```csharp
+public event Action<System.Exception> OnLoadError = null;
+```
+
+This `OnLoadError` is triggered when there was an error loading one of the default scopes. After this event is handled, the server will close.
+
+```csharp
+public event Action OnLoadComplete = null;
+```
+
+This `OnLoadComplete` is triggered when the set of default scopes was successfully loaded. Ensure no exception is triggered here, or the server will stop.
+
+```csharp
+public event Action<uint, ScopeServerSide, System.Exception> OnUnloadError = null;
+```
+
+This `OnUnloadError` event is triggered for one specific scope raising an error when being unloaded, passing id, scope instance and the exception.
+
+```csharp
+public event Action OnUnloadComplete = null;
+```
+
+This `OnUnloadComplete` event is triggered when the default scopes are completely loaded. Ensure no exception is triggered here.
+
+#### Protocol connection events
+
+```csharp
+public event Func<ulong, Task> OnWelcome = null;
+```
+
+This `OnWelcome` event is triggered when a new connection is established, by passing the connection id.
+
+```csharp
+public event Func<ulong, uint, Task> OnLeavingScope = null;
+```
+
+This `OnLeavingScope` event is triggered when a connection is leaving a certain scope (it can even be `Scope.Limbo` or `Scope.Maintenance`), given by its id.
+
+```csharp
+public event Func<ulong, uint, Task> OnJoiningScope = null;
+```
+
+This `OnJoiningScope` event is triggered when a connection is entering a certain scope (it can even be `Scope.Limbo` or `Scope.Maintenance`), given by its id.
+
+```csharp
+public event Func<ulong, uint, Task> OnGoodBye = null;
+```
+
+This `OnGoodbye` event is triggered when a connection is terminated, by passing the connection id.
+
+##### On client-side
+
+```csharp
+public event Action OnWelcome;
+```
+
+This `OnWelcome` event is triggered when the connection is initialized in the scopes. It will, at first, not belong to any scope.
+
+```csharp
+public event Action<ScopeClientSide> OnMovedToScope;
+```
+
+This `OnMovedToScope` event is triggered when the server moved the current connection to a new scope. Then, the new scope was successfully loaded and this event is triggered with its instance.
+
+```csharp
+public event Action<ObjectClientSide> OnSpawned;
+```
+
+This `OnSpawned` event is triggered when an object was spawned from the server side in the same scope this connection is in. In this case, the client side for that object was also spawned in the client and this event is triggered with its instance.
+
+```csharp
+public event Action<ObjectClientSide, ISerializable> OnRefreshed;
+```
+
+This `OnRefreshed` event is triggered when an object was refreshed from the server side in the same scope this connection is in. In this case, this callback is invoked with the client-side object and the data used to refresh it.
+
+```csharp
+public event Action<ObjectClientSide> OnDespawned;
+```
+
+This `OnDespawned` event is triggered when an object was de-spawned from the server side in the same scope this connection is in. The formerly valid object (client side) is passed to this callback.
+
+```csharp
+public event Action<string> OnLocalError;
+```
+
+This `OnLocalError` event is triggered when a local error occurred in the client side. By this point, the client has closed and notified the server so the server can close its side. The string is arbitrary and just a way to inform a code of what happened.
+
+- InvalidServerScope, ScopeMismatch and ScopeLoadError refers to some sort of mismanagement of the scope.
+- SpawnError, RefreshError and DespawnError refers to some sort of mismanagement of the objects in the scope.
 
 ### Dynamically creating objects
 
