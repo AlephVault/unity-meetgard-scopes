@@ -3,6 +3,7 @@ using AlephVault.Unity.Meetgard.Scopes.Types.Protocols;
 using AlephVault.Unity.Support.Utils;
 using System.Collections.Generic;
 using System;
+using UnityEngine;
 
 
 namespace AlephVault.Unity.Meetgard.Scopes
@@ -39,8 +40,9 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///   </para>
                     /// </summary>
                     /// <param name="prefabId">The index of the prefab to instantiate</param>
+                    /// <param name="initialize">An optional callback to initialize the object</param>
                     /// <returns>The object instance</returns>
-                    public ObjectServerSide InstantiateHere(uint prefabId)
+                    public ObjectServerSide InstantiateHere(uint prefabId, Action<ObjectServerSide> initialize = null)
                     {
                         XDebug debugger = new XDebug("Meetgard.Scopes", this, $"InstantiateHere({prefabId})", debug);
                         debugger.Start();
@@ -51,7 +53,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                         debugger.End();
 
                         // Now the object is to be instantiated and returned.
-                        return InstantiateAndFill(objectPrefabs[prefabId], prefabId);
+                        return InstantiateAndFill(objectPrefabs[prefabId], prefabId, initialize);
                     }
 
                     /// <summary>
@@ -67,8 +69,9 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///   </para>
                     /// </summary>
                     /// <param name="key">The key of the prefab to instantiate</param>
+                    /// <param name="initialize">An optional callback to initialize the object</param>
                     /// <returns>The object instance</returns>
-                    public ObjectServerSide InstantiateHere(string key)
+                    public ObjectServerSide InstantiateHere(string key, Action<ObjectServerSide> initialize = null)
                     {
                         XDebug debugger = new XDebug("Meetgard.Scopes", this, $"InstantiateHere({key})", debug);
                         debugger.Start();
@@ -93,7 +96,7 @@ namespace AlephVault.Unity.Meetgard.Scopes
                         debugger.End();
 
                         // Now the object is to be instantiated and returned.
-                        return InstantiateAndFill(objectPrefabs[prefabId], prefabId);
+                        return InstantiateAndFill(objectPrefabs[prefabId], prefabId, initialize);
                     }
 
                     /// <summary>
@@ -110,14 +113,15 @@ namespace AlephVault.Unity.Meetgard.Scopes
                     ///   </para>
                     /// </summary>
                     /// <param name="prefab">The prefab to instantiate</param>
+                    /// <param name="initialize">An optional callback to initialize the object</param>
                     /// <returns>The object instance</returns>
-                    public ObjectServerSide InstantiateHere(ObjectServerSide prefab)
+                    public ObjectServerSide InstantiateHere(ObjectServerSide prefab, Action<ObjectServerSide> initialize = null)
                     {
                         XDebug debugger = new XDebug("Meetgard.Scopes", this, $"InstantiateHere({prefab})", debug);
                         debugger.Start();
                         if (prefab == null)
                         {
-                            throw new ArgumentNullException("prefab");
+                            throw new ArgumentNullException(nameof(prefab));
                         }
 
                         uint prefabId;
@@ -132,15 +136,30 @@ namespace AlephVault.Unity.Meetgard.Scopes
                         debugger.End();
 
                         // Now the object is to be instantiated and returned.
-                        return InstantiateAndFill(objectPrefabs[prefabId], prefabId);
+                        return InstantiateAndFill(objectPrefabs[prefabId], prefabId, initialize);
                     }
 
                     // Instantiates and populates the object's id fields.
-                    private ObjectServerSide InstantiateAndFill(ObjectServerSide prefab, uint prefabId)
-                    {
+                    private ObjectServerSide InstantiateAndFill(
+                        ObjectServerSide prefab, uint prefabId, Action<ObjectServerSide> initialize = null
+                    ) {
                         XDebug debugger = new XDebug("Meetgard.Scopes", this, $"InstantiateAndFill({prefab}, {prefabId})", debug);
                         debugger.Start();
                         ObjectServerSide instance = Instantiate(prefab);
+                        try
+                        {
+                            initialize?.Invoke(instance);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogException(e);
+                            Debug.LogError(
+                                $"An error of type {e.GetType().FullName} has occurred in object server side's pre-initialization. " +
+                                "If the exceptions are not properly handled, the game state might be inconsistent."
+                            );
+                            throw;
+                        }
+
                         instance.PrefabId = prefabId;
                         instance.Protocol = this;
                         debugger.End();
